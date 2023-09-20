@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: b
+          uri: http://service-b:8080
+          predicates:
+            - Path=/api/**

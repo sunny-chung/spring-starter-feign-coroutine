@@ -1,0 +1,34 @@
+services:
+  apigateway:
+    build:
+      context: apigateway
+      dockerfile: ../example/Dockerfile
+    ports:
+      - 10000:8080
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 200M
+  service-a:
+    build:
+      context: example
+    ports:
+      - 10001:8080
+      - 10011:5005
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 200M
+  service-b:
+    build:
+      context: example
+    ports:
+      - 10002:8080
+      - 10012:5005
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 200M
