@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            default-request-headers:
+              content-type: application/json
+          svc-a:
+            logger-level: full
+            url: http://service-a:8080/api/
+
+logging:
+  level:
+    com.sunnychung.example.springfeigncoroutine: DEBUG
