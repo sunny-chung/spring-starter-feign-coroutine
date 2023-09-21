@@ -3,4 +3,5 @@ plugins {
 
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.spring") version kotlinVersion apply false
+    kotlin("kapt") version kotlinVersion apply false
 }

@@ -3,6 +3,7 @@ package com.sunnychung.lib.server.springfeigncoroutine.config
 import com.sunnychung.lib.server.springfeigncoroutine.annotation.CoroutineFeignClient
 import com.sunnychung.lib.server.springfeigncoroutine.annotation.EnableCoroutineFeignClients
 import com.sunnychung.lib.server.springfeigncoroutine.feign.AddHeaderFeignRequestInterceptor
+import com.sunnychung.lib.server.springfeigncoroutine.mapper.ConfigMapper
 import feign.Contract
 import feign.Logger
 import feign.Request
@@ -58,6 +59,8 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
             addIncludeFilter(AnnotationTypeFilter(CoroutineFeignClient::class.java))
         }
 
+        val configMapper = ConfigMapper.INSTANCE
+
         basePackages.flatMap { scanProvider.findCandidateComponents(it) }
             .map { it.beanClassName }
             .distinct()
@@ -65,10 +68,11 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
                 val clazz = Class.forName(it)
                 val annotation = clazz.getAnnotation(CoroutineFeignClient::class.java)
 
-                val config = feignClientProperties.config[annotation.name] ?:
-                    feignClientProperties.config[feignClientProperties.defaultConfig]!!
-
-                // TODO copy default config to specific config if partially null
+                val config = FeignClientProperties.FeignClientConfiguration()
+                val propertiesDefaultConfig = feignClientProperties.config[feignClientProperties.defaultConfig]
+                val propertiesSpecificConfig = feignClientProperties.config[annotation.name]
+                configMapper.copy(from = propertiesDefaultConfig, to = config)
+                configMapper.copy(from = propertiesSpecificConfig, to = config)
 
                 beanRegistry.registerSingleton(
                     clazz.simpleName,
