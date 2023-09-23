@@ -12,6 +12,7 @@ import feign.Retryer
 import feign.codec.Decoder
 import feign.codec.Encoder
 import feign.kotlin.CoroutineFeign
+import io.netty.channel.ChannelOption
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
@@ -106,8 +107,9 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
         config.exceptionPropagationPolicy?.let { builder.exceptionPropagationPolicy(it) }
         config.capabilities?.forEach { builder.addCapability(beanRegistry.getBean(it)) }
 
+        val connectTimeoutMs = config.connectTimeout?.toLong() ?: (10 * 1000L)
         builder.options(Request.Options(
-            /* connectTimeout = */ config.connectTimeout?.toLong() ?: (10 * 1000L), // TODO not in use
+            /* connectTimeout = */ connectTimeoutMs,
             /* connectTimeoutUnit = */ TimeUnit.MILLISECONDS,
             /* readTimeout = */ config.readTimeout?.toLong() ?: (30 * 1000L),
             /* readTimeoutUnit = */ TimeUnit.MILLISECONDS,
@@ -129,6 +131,7 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
                 .maxIdleTime(Duration.ofSeconds(10))
                 .build()
             val httpClient = HttpClient.create(connectionProvider)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMs.toInt())
             clientConnector(ReactorClientHttpConnector(httpClient))
         })
 
