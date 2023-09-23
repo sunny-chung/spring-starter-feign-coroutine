@@ -3,6 +3,7 @@ package com.sunnychung.lib.server.springfeigncoroutine.config
 import com.sunnychung.lib.server.springfeigncoroutine.annotation.CoroutineFeignClient
 import com.sunnychung.lib.server.springfeigncoroutine.annotation.EnableCoroutineFeignClients
 import com.sunnychung.lib.server.springfeigncoroutine.feign.AddHeaderFeignRequestInterceptor
+import com.sunnychung.lib.server.springfeigncoroutine.httpclient.webclient.WebClientExecutor
 import com.sunnychung.lib.server.springfeigncoroutine.mapper.ConfigMapper
 import feign.Contract
 import feign.Logger
@@ -23,6 +24,10 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
 import org.springframework.core.env.Environment
 import org.springframework.core.type.AnnotationMetadata
 import org.springframework.core.type.filter.AnnotationTypeFilter
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import reactor.netty.http.client.HttpClient
+import reactor.netty.resources.ConnectionProvider
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware {
@@ -102,11 +107,11 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
         config.capabilities?.forEach { builder.addCapability(beanRegistry.getBean(it)) }
 
         builder.options(Request.Options(
-            /* connectTimeout = */ config.connectTimeout?.toLong() ?: (10 * 1000L),
+            /* connectTimeout = */ config.connectTimeout?.toLong() ?: (10 * 1000L), // TODO not in use
             /* connectTimeoutUnit = */ TimeUnit.MILLISECONDS,
             /* readTimeout = */ config.readTimeout?.toLong() ?: (30 * 1000L),
             /* readTimeoutUnit = */ TimeUnit.MILLISECONDS,
-            /* followRedirects = */ config.isFollowRedirects ?: true
+            /* followRedirects = */ config.isFollowRedirects ?: true // TODO not in use
         ))
 
         config.defaultRequestHeaders.orEmpty().let {
@@ -116,6 +121,16 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
         }
 
         // TODO default query parameters
+
+        builder.client(WebClientExecutor {
+            val connectionProvider = ConnectionProvider.builder("webclient-connections")
+                .maxConnections(2000)
+                .pendingAcquireMaxCount(6100)
+                .maxIdleTime(Duration.ofSeconds(10))
+                .build()
+            val httpClient = HttpClient.create(connectionProvider)
+            clientConnector(ReactorClientHttpConnector(httpClient))
+        })
 
         return builder.target(type, config.url)
     }
