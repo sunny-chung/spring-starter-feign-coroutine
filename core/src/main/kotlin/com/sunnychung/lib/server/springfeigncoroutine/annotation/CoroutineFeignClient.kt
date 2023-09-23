@@ -2,4 +2,4 @@ package com.sunnychung.lib.server.springfeigncoroutine.annotation
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class CoroutineFeignClient(val name: String)
+annotation class CoroutineFeignClient(val name: String, val url: String = "")

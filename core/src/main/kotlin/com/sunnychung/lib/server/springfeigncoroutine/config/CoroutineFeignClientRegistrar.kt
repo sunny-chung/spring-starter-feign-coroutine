@@ -2,6 +2,7 @@ package com.sunnychung.lib.server.springfeigncoroutine.config
 
 import com.sunnychung.lib.server.springfeigncoroutine.annotation.CoroutineFeignClient
 import com.sunnychung.lib.server.springfeigncoroutine.annotation.EnableCoroutineFeignClients
+import com.sunnychung.lib.server.springfeigncoroutine.extension.emptyToNull
 import com.sunnychung.lib.server.springfeigncoroutine.feign.AddHeaderFeignRequestInterceptor
 import com.sunnychung.lib.server.springfeigncoroutine.httpclient.webclient.WebClientExecutor
 import com.sunnychung.lib.server.springfeigncoroutine.mapper.ConfigMapper
@@ -79,6 +80,7 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
                 val propertiesSpecificConfig = feignClientProperties.config[annotation.name]
                 configMapper.copy(from = propertiesDefaultConfig, to = config)
                 configMapper.copy(from = propertiesSpecificConfig, to = config)
+                annotation.url.emptyToNull()?.let { config.url = it }
 
                 beanRegistry.registerSingleton(
                     clazz.simpleName,
