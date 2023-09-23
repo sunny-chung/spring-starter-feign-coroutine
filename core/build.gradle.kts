@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.sunny-chung"
-version = "0.2.0-SNAPSHOT"
+version = "0.3.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
