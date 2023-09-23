@@ -92,6 +92,8 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
             .retryer(beanRegistry.getBean(config.retryer ?: Retryer::class.java))
             .logger(beanRegistry.getBean(FeignLoggerFactory::class.java).create(type))
 
+        config.responseInterceptor?.let { builder.responseInterceptor(beanRegistry.getBean(it)) }
+
         config.queryMapEncoder?.let { builder.queryMapEncoder(beanRegistry.getBean(it)) }
         config.errorDecoder?.let { builder.errorDecoder(beanRegistry.getBean(it)) }
 
