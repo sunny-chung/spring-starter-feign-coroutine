@@ -108,12 +108,13 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
         config.capabilities?.forEach { builder.addCapability(beanRegistry.getBean(it)) }
 
         val connectTimeoutMs = config.connectTimeout?.toLong() ?: (10 * 1000L)
+        val isFollowRedirects = config.isFollowRedirects ?: true
         builder.options(Request.Options(
             /* connectTimeout = */ connectTimeoutMs,
             /* connectTimeoutUnit = */ TimeUnit.MILLISECONDS,
             /* readTimeout = */ config.readTimeout?.toLong() ?: (30 * 1000L),
             /* readTimeoutUnit = */ TimeUnit.MILLISECONDS,
-            /* followRedirects = */ config.isFollowRedirects ?: true // TODO not in use
+            /* followRedirects = */ isFollowRedirects
         ))
 
         config.defaultRequestHeaders.orEmpty().let {
@@ -132,6 +133,7 @@ class CoroutineFeignClientRegistrar : ImportBeanDefinitionRegistrar, Environment
                 .build()
             val httpClient = HttpClient.create(connectionProvider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMs.toInt())
+                .followRedirect(isFollowRedirects)
             clientConnector(ReactorClientHttpConnector(httpClient))
         })
 
