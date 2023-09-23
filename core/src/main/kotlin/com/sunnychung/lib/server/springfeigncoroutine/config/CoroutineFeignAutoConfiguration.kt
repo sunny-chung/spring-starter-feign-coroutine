@@ -25,18 +25,18 @@ class CoroutineFeignAutoConfiguration {
     var logger: Logger? = null
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(Contract::class)
     fun contract(): Contract = SpringCoroutineContract()
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(Retryer::class)
     fun feignRetryer(): Retryer {
         return Retryer.NEVER_RETRY
     }
 
     @Bean
     @ConditionalOnMissingBean(FeignLoggerFactory::class)
-    fun feignLoggerFactory(): FeignLoggerFactory? {
+    fun feignLoggerFactory(): FeignLoggerFactory {
         return DefaultFeignLoggerFactory(logger)
     }
 }
