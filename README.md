@@ -28,6 +28,8 @@ Setting:
 - Infinite loops of calls within 200 seconds
 - Each request requires 3s non-blocking processing time
 - Call path: Spring Cloud Gateway -> Example Application --(feign)--> Example Application
+- All services are run inside docker containers
+- Each docker container has only 200 MB memory limit
 
 |            | Direct call without feign | **Spring Feign Coroutine Starter** | feign-kotlin |
 |------------|---------------------------|------------------------------------|--------------|
