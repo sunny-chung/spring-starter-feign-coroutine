@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -12,6 +14,13 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += "-Xjsr305=strict"
+        jvmTarget = "17"
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -24,6 +33,9 @@ dependencies {
     implementation("io.projectreactor.netty:reactor-netty-http:1.1.10")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator:3.2.2")
+    implementation("io.github.openfeign:feign-micrometer:12.5")
 }
 
 

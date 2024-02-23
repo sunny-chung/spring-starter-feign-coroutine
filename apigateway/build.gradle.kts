@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.1.3"
+	id("org.springframework.boot") version "3.2.2"
 	id("io.spring.dependency-management") version "1.1.3"
 	kotlin("jvm")
 	kotlin("plugin.spring")
@@ -19,12 +19,14 @@ repositories {
 	mavenCentral()
 }
 
-extra["springCloudVersion"] = "2022.0.4"
+extra["springCloudVersion"] = "2023.0.0" //"2022.0.4"
 
 archivesName.set("example")
 
 dependencies {
 	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("io.micrometer:micrometer-tracing-bridge-brave")
 }
 
 dependencyManagement {
