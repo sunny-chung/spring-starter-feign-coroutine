@@ -7,7 +7,7 @@ NOTE: Since v0.4.0, the artifact groupId is changed to 'io.github.sunny-chung'.
 
 This starter module serves as a temporary solution of using Spring Boot with Coroutine Feign,
 until Spring Cloud OpenFeign officially supports it. This module provides Spring Boot integration with the
-[Feign 12 Kotlin module](https://github.com/OpenFeign/feign/tree/master/kotlin), the reactive Spring WebClient and Micrometer.
+[Feign Kotlin module](https://github.com/OpenFeign/feign/tree/master/kotlin), the reactive Spring WebClient and Micrometer.
 
 A limited set of Spring Cloud OpenFeign features is supported. *Unsupported* features include:
 - Default Encoder and Decoder beans (users must provide these beans)
@@ -129,7 +129,17 @@ Similar to Spring Cloud OpenFeign, just include Micrometer in classpath, then ev
 
 ### Demo
 
-Run the demo servers using `./run-local.sh`, make a cURL request to API gateway which calls service-b which calls service-a. A log like below is observed:
+Run the demo servers using `./run-local.sh`, make a cURL request to API gateway which calls service-b which calls service-a.
+
+```
+curl --verbose \
+  --request "POST" \
+  --url "http://localhost:10000/api/b" \
+  --header "Content-Type: application/json" \
+  --data "{\"x\": 10}"
+```
+
+The server log combined in Docker Compose like below is observed:
 
 ```
 spring-feign-coroutine-apigateway-1  | 2024-02-24T08:33:12.075Z  INFO 1 --- [ctor-http-nio-2] [65d9a9c86af376b32fea95088ceb267b-2fea95088ceb267b] c.s.e.springfeigncoroutine.LogFilter     : Request -- POST /api/b
