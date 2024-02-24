@@ -1,10 +1,13 @@
 # Spring Feign Coroutine Starter
 
-[![JitPack Release](https://jitpack.io/v/sunny-chung/spring-starter-feign-coroutine.svg)](https://jitpack.io/#sunny-chung/spring-starter-feign-coroutine)
+![GitHub](https://img.shields.io/github/license/sunny-chung/spring-starter-feign-coroutine)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.sunny-chung/spring-starter-feign-coroutine)
+
+NOTE: Since v0.4.0, the artifact groupId is changed to 'io.github.sunny-chung'.
 
 This starter module serves as a temporary solution of using Spring Boot with Coroutine Feign,
 until Spring Cloud OpenFeign officially supports it. This module provides Spring Boot integration with the
-[Feign 12 Kotlin module](https://github.com/OpenFeign/feign/tree/master/kotlin) and the reactive Spring WebClient.
+[Feign 12 Kotlin module](https://github.com/OpenFeign/feign/tree/master/kotlin), the reactive Spring WebClient and Micrometer.
 
 A limited set of Spring Cloud OpenFeign features is supported. *Unsupported* features include:
 - Default Encoder and Decoder beans (users must provide these beans)
@@ -58,16 +61,9 @@ the example projects ([API Gateway](apigateway), [Example Application](example))
 In build.gradle.kts (or equivalent), add:
 
 ```kotlin
-repositories {
-    // ...
-    maven(url = "https://jitpack.io")
-}
-```
-
-```kotlin
 dependencies {
     // ...
-    implementation("com.github.sunny-chung:spring-starter-feign-coroutine:<version>")
+    implementation("io.github.sunny-chung:spring-starter-feign-coroutine:<version>")
 }
 ```
 
@@ -127,3 +123,33 @@ Entire response body is read into memory before next step, this means it would p
 reactive clients for large response body or streaming.
 
 `Flow<T>` is not yet supported.
+
+## Micrometer Integration
+Similar to Spring Cloud OpenFeign, just include Micrometer in classpath, then everything is autoconfigured. It can be configured using the same set of application properties.
+
+### Demo
+
+Run the demo servers using `./run-local.sh`, make a cURL request to API gateway which calls service-b which calls service-a. A log like below is observed:
+
+```
+spring-feign-coroutine-apigateway-1  | 2024-02-24T08:33:12.075Z  INFO 1 --- [ctor-http-nio-2] [65d9a9c86af376b32fea95088ceb267b-2fea95088ceb267b] c.s.e.springfeigncoroutine.LogFilter     : Request -- POST /api/b
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.602Z  INFO 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.s.ApiController                    : API b
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.608Z DEBUG 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] ---> POST http://service-a:8080/api/a HTTP/1.1
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.608Z DEBUG 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] Content-Length: 15
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.608Z DEBUG 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] content-type: application/json
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.608Z DEBUG 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] 
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.608Z DEBUG 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] {
+spring-feign-coroutine-service-b-1   |   "x" : "b"
+spring-feign-coroutine-service-b-1   | }
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:12.608Z DEBUG 1 --- [         task-1] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] ---> END HTTP (15-byte body)
+spring-feign-coroutine-service-a-1   | 2024-02-24T08:33:13.211Z  INFO 1 --- [ctor-http-nio-2] [65d9a9c86af376b32fea95088ceb267b-30c56df6c7d7ee63] c.s.e.s.ApiController                    : API a -- b
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:16.333Z DEBUG 1 --- [ctor-http-nio-4] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] <--- HTTP/1.1 200 (3724ms)
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:16.333Z DEBUG 1 --- [ctor-http-nio-4] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] content-length: 11
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:16.333Z DEBUG 1 --- [ctor-http-nio-4] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] content-type: application/json
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:16.333Z DEBUG 1 --- [ctor-http-nio-4] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] 
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:16.333Z DEBUG 1 --- [ctor-http-nio-4] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] {"x":"b a"}
+spring-feign-coroutine-service-b-1   | 2024-02-24T08:33:16.333Z DEBUG 1 --- [ctor-http-nio-4] [65d9a9c86af376b32fea95088ceb267b-5273a545473a290f] c.s.e.springfeigncoroutine.RemoteApi     : [RemoteApi#a] <--- END HTTP (11-byte body)
+spring-feign-coroutine-apigateway-1  | 2024-02-24T08:33:16.370Z  INFO 1 --- [ctor-http-nio-2] [65d9a9c86af376b32fea95088ceb267b-2fea95088ceb267b] c.s.e.springfeigncoroutine.LogFilter     : Response -- POST /api/b -- 4294ms
+```
+
+Note the traceId (65d9a9c86af376b32fea95088ceb267b) is propagated and consistent.

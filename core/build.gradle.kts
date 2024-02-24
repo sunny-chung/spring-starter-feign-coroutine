@@ -5,10 +5,11 @@ plugins {
     kotlin("plugin.spring")
     id("maven-publish")
     kotlin("kapt")
+    id("sunnychung.publication")
 }
 
-group = "com.github.sunny-chung"
-version = "0.3.0"
+group = "io.github.sunny-chung"
+version = "0.4.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
