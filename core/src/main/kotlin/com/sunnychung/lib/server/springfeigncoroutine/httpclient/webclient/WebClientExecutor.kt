@@ -3,6 +3,7 @@ package com.sunnychung.lib.server.springfeigncoroutine.httpclient.webclient
 import feign.AsyncClient
 import feign.Request
 import feign.Response
+import org.apache.commons.logging.LogFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpMethod
 import org.springframework.web.reactive.function.client.WebClient
@@ -13,6 +14,8 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class WebClientExecutor(webClientCustomizer: (WebClient.Builder.() -> Unit)? = null) : AsyncClient<Unit> {
+    val log = LogFactory.getLog(javaClass)
+
     val client = WebClient.builder()
         .apply { webClientCustomizer?.invoke(it) }
         .build()
@@ -35,7 +38,7 @@ class WebClientExecutor(webClientCustomizer: (WebClient.Builder.() -> Unit)? = n
                 nativeRequest.responseTimeout(Duration.ofMillis(options.readTimeoutMillis().toLong()))
             }
             .exchangeToMono { response ->
-                println("exchangeToMono")
+                log.info("exchangeToMono")
                 Mono.just(
                     Response.builder()
                         .status(response.statusCode().value())

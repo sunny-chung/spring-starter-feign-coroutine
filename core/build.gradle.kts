@@ -25,9 +25,11 @@ repositories {
     mavenCentral()
 }
 
+val feignCoreVersion = "13.2.1"
+
 dependencies {
-    implementation("io.github.openfeign:feign-kotlin:12.5")
-    implementation("io.github.openfeign:feign-slf4j:12.5")
+    implementation("io.github.openfeign:feign-kotlin:$feignCoreVersion")
+    implementation("io.github.openfeign:feign-slf4j:$feignCoreVersion")
     implementation("org.springframework.cloud:spring-cloud-openfeign-core:4.0.4")
     implementation("org.springframework:spring-webflux:6.0.11")
     implementation("io.projectreactor.netty:reactor-netty-http:1.1.10")
@@ -35,7 +37,7 @@ dependencies {
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator:3.2.2")
-    implementation("io.github.openfeign:feign-micrometer:12.5")
+    implementation("io.github.openfeign:feign-micrometer:$feignCoreVersion")
 }
 
 
