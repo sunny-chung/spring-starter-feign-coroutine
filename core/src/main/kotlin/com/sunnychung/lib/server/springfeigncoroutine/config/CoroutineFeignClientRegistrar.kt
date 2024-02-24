@@ -7,6 +7,7 @@ import com.sunnychung.lib.server.springfeigncoroutine.feign.AddHeaderFeignReques
 import com.sunnychung.lib.server.springfeigncoroutine.httpclient.webclient.WebClientExecutor
 import com.sunnychung.lib.server.springfeigncoroutine.mapper.ConfigMapper
 import feign.Capability
+import feign.ContextManipulateProvider
 import feign.Contract
 import feign.Logger
 import feign.Request
@@ -14,6 +15,8 @@ import feign.Retryer
 import feign.codec.Decoder
 import feign.codec.Encoder
 import feign.kotlin.CoroutineFeign
+import io.micrometer.context.ContextSnapshot
+import io.micrometer.context.ContextSnapshotFactory
 import io.netty.channel.ChannelOption
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
@@ -112,6 +115,19 @@ class CoroutineFeignClientRegistrar : BeanDefinitionRegistryPostProcessor/*, Env
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMs.toInt())
                 .followRedirect(isFollowRedirects)
             clientConnector(ReactorClientHttpConnector(httpClient))
+        })
+
+        builder.contextManipulateProvider(object : ContextManipulateProvider {
+            val CONTEXT_KEY = "MicrometerContext"
+
+            override fun snapshot(context: MutableMap<String, Any>) {
+                val snapshot: ContextSnapshot = ContextSnapshotFactory.builder().build().captureAll()
+                context[CONTEXT_KEY] = snapshot
+            }
+
+            override fun restore(context: MutableMap<String, Any>) {
+                (context[CONTEXT_KEY] as ContextSnapshot).setThreadLocals()
+            }
         })
 
         return builder.target(type, config.url)

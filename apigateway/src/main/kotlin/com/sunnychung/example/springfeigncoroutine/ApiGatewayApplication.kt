@@ -8,7 +8,7 @@ import reactor.core.publisher.Hooks
 class ApiGatewayApplication
 
 fun main(args: Array<String>) {
-	System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")
-	Hooks.enableAutomaticContextPropagation()
+//	System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")
+//	Hooks.enableAutomaticContextPropagation()
 	runApplication<ApiGatewayApplication>(*args)
 }

@@ -28,16 +28,26 @@ repositories {
 val feignCoreVersion = "13.2.1"
 
 dependencies {
-    implementation("io.github.openfeign:feign-kotlin:$feignCoreVersion")
-    implementation("io.github.openfeign:feign-slf4j:$feignCoreVersion")
-    implementation("org.springframework.cloud:spring-cloud-openfeign-core:4.0.4")
+    implementation("io.github.sunny-chung:feign-kotlin:$feignCoreVersion-patch-1") {
+        exclude(group = "io.github.openfeign", module = "feign-core")
+    }
+    implementation("io.github.openfeign:feign-slf4j:$feignCoreVersion") {
+        exclude(group = "io.github.openfeign", module = "feign-core")
+    }
+    implementation("io.github.sunny-chung:feign-core:$feignCoreVersion-patch-1")
+    implementation("org.springframework.cloud:spring-cloud-openfeign-core:4.0.4") {
+        exclude(group = "io.github.openfeign", module = "feign-core")
+    }
     implementation("org.springframework:spring-webflux:6.0.11")
     implementation("io.projectreactor.netty:reactor-netty-http:1.1.10")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator:3.2.2")
-    implementation("io.github.openfeign:feign-micrometer:$feignCoreVersion")
+    implementation("io.github.openfeign:feign-micrometer:$feignCoreVersion") {
+        exclude(group = "io.github.openfeign", module = "feign-core")
+    }
+    implementation("io.micrometer:context-propagation:1.1.1")
 }
 
 

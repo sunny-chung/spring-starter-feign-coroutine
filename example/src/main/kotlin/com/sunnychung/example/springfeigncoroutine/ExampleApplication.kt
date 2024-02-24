@@ -10,7 +10,7 @@ import reactor.core.publisher.Hooks
 class ExampleApplication
 
 fun main(args: Array<String>) {
-	System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")
-	Hooks.enableAutomaticContextPropagation()
+//	System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")
+//	Hooks.enableAutomaticContextPropagation()
 	runApplication<ExampleApplication>(*args)
 }

@@ -9,6 +9,8 @@ spring:
           svc-a:
             logger-level: full
             url: http://service-a:8080/api/
+  reactor:
+    context-propagation: auto
 
 logging:
   level:

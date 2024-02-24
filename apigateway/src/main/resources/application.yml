@@ -6,3 +6,5 @@ spring:
           uri: http://service-b:8080
           predicates:
             - Path=/api/**
+  reactor:
+    context-propagation: auto
