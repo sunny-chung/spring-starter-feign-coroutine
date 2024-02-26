@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/sunny-chung/spring-starter-feign-coroutine)
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.sunny-chung/spring-starter-feign-coroutine)
 
-NOTE: Since v0.4.0, the artifact groupId is changed to 'io.github.sunny-chung'.
+NOTE: Since v0.4.0, the artifact groupId is changed to 'io.github.sunny-chung'. Also, [a dependency resolution rule is needed](#getting-started) to add to build.gradle.kts.
 
 This starter module serves as a temporary solution of using Spring Boot with Coroutine Feign,
 until Spring Cloud OpenFeign officially supports it. This module provides Spring Boot integration with the
@@ -64,6 +64,30 @@ In build.gradle.kts (or equivalent), add:
 dependencies {
     // ...
     implementation("io.github.sunny-chung:spring-starter-feign-coroutine:<version>")
+}
+```
+
+Since v0.4.0, it is not compatible with some of the official feign modules, so please also add to the root level of build.gradle.kts:
+```kotlin
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "io.github.openfeign" && requested.name in setOf("feign-kotlin", "feign-core")) {
+            useTarget("io.github.sunny-chung:${requested.name}:13.2.1-patch-1")
+        }
+    }
+}
+```
+
+If there are multiple Gradle modules within the same project, the resolution can be added to the root build.gradle.kts instead:
+```kotlin
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "io.github.openfeign" && requested.name in setOf("feign-kotlin", "feign-core")) {
+                useTarget("io.github.sunny-chung:${requested.name}:13.2.1-patch-1")
+            }
+        }
+    }
 }
 ```
 
